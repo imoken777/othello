@@ -19,21 +19,42 @@ const Home = () => {
   const clickCell = (x: number, y: number) => {
     console.log(x, y);
     const newBoard: number[][] = JSON.parse(JSON.stringify(board));
-    console.log(1);
-    if (board[y + 1] !== undefined && board[y + 1][x] !== 0 && board[y + 1][x] !== turnColor) {
-      newBoard[y][x] = turnColor;
 
-      console.log(2);
-      for (let i = 0; i < 8; i++) {
-        newBoard[y + i][x] = turnColor;
-        console.log(3);
+    if (
+      board[y + 1] !== undefined &&
+      board[y + 1][x] !== 0 &&
+      board[y + 1][x] !== turnColor &&
+      board[y][x] === 0
+    ) {
+      for (let i = y + 1; i < board.length; i++) {
+        if (board[i][x] === turnColor) {
+          newBoard[y][x] = turnColor;
+          for (let j = y + 1; j < i; j++) {
+            newBoard[j][x] = turnColor;
+          }
+          setTurnColor(3 - turnColor);
+        }
       }
-      console.log(4);
-      setTurnColor(3 - turnColor);
     }
-    console.log(5);
-    setBoard(newBoard);
+
+    if (
+      board[y - 1] !== undefined &&
+      board[y - 1][x] !== 0 &&
+      board[y - 1][x] !== turnColor &&
+      board[y][x] === 0
+    ) {
+      for (let i = y - 1; i >= 0 && i < board.length; i = i - 1) {
+        if (board[i][x] === turnColor) {
+          newBoard[y][x] = turnColor;
+          for (let j = y - 1; j > i; j = j - 1) {
+            newBoard[j][x] = turnColor;
+          }
+          setTurnColor(3 - turnColor);
+        }
+      }
+    }
     console.log(turnColor);
+    setBoard(newBoard);
   };
 
   return (
@@ -42,7 +63,7 @@ const Home = () => {
         {board.map((row, y) =>
           row.map((color, x) => (
             <div className={styles.sell} key={`${x}-${y}`} onClick={() => clickCell(x, y)}>
-              {color != 0 && (
+              {color !== 0 && (
                 <div
                   className={styles.stone}
                   style={{ background: color === 1 ? '#000' : '#fff' }}
