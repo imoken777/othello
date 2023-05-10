@@ -19,7 +19,7 @@ const Home = () => {
   const clickCell = (x: number, y: number) => {
     console.log(x, y);
     const newBoard: number[][] = JSON.parse(JSON.stringify(board));
-
+    //上
     if (
       board[y + 1] !== undefined &&
       board[y + 1][x] !== 0 &&
@@ -36,7 +36,7 @@ const Home = () => {
         }
       }
     }
-
+    //下
     if (
       board[y - 1] !== undefined &&
       board[y - 1][x] !== 0 &&
@@ -53,6 +53,50 @@ const Home = () => {
         }
       }
     }
+    //左
+    if (board[x + 1] !== undefined && board[y][x] === 0 && board[y][x + 1] !== turnColor) {
+      for (let i = x + 1; i < board.length; i++) {
+        if (board[y][i] === turnColor) {
+          newBoard[y][x] = turnColor;
+          for (let j = x + 1; j < i; j++) {
+            newBoard[y][j] = turnColor;
+          }
+          setTurnColor(3 - turnColor);
+        }
+      }
+    }
+    //右
+    if (board[x - 1] !== undefined && board[y][x] === 0 && board[y][x - 1] !== turnColor) {
+      for (let i = x - 1; i >= 0 && i < board.length; i = i - 1) {
+        if (board[y][i] === turnColor) {
+          newBoard[y][x] = turnColor;
+          for (let j = x - 1; j > i; j = j - 1) {
+            newBoard[y][j] = turnColor;
+          }
+          setTurnColor(3 - turnColor);
+        }
+      }
+    }
+
+    // 右上機能してません
+    if (
+      board[y - 1] !== undefined &&
+      board[y - 1][x - 1] !== undefined &&
+      board[y - 1][x - 1] !== 0 &&
+      board[y - 1][x - 1] !== turnColor &&
+      board[y][x] === 0
+    ) {
+      for (let i = 1; y - i >= 0 && x + i < board.length; i++) {
+        if (board[y - i][x - i] === turnColor) {
+          newBoard[y][x] = turnColor;
+          for (let j = 1; j < i; j++) {
+            newBoard[y - j][x - j] = turnColor;
+          }
+          setTurnColor(3 - turnColor);
+        }
+      }
+    }
+
     console.log(turnColor);
     setBoard(newBoard);
   };
