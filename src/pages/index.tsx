@@ -16,88 +16,72 @@ const Home = () => {
 
 
 ]);
+  const count_stone = (color: number) => {
+    let count = 0;
+    for (const row of board) {
+      for (const cell of row) {
+        if (color === cell) {
+          count++;
+        }
+      }
+    }
+    return count;
+  };
   const clickCell = (x: number, y: number) => {
-    console.log(x, y);
     const newBoard: number[][] = JSON.parse(JSON.stringify(board));
-    //上
-    if (
-      board[y + 1] !== undefined &&
-      board[y + 1][x] !== 0 &&
-      board[y + 1][x] !== turnColor &&
-      board[y][x] === 0
-    ) {
-      for (let i = y + 1; i < board.length; i++) {
-        if (board[i][x] === turnColor) {
-          newBoard[y][x] = turnColor;
-          for (let j = y + 1; j < i; j++) {
-            newBoard[j][x] = turnColor;
-          }
-          setTurnColor(3 - turnColor);
-        }
-      }
-    }
-    //下
-    if (
-      board[y - 1] !== undefined &&
-      board[y - 1][x] !== 0 &&
-      board[y - 1][x] !== turnColor &&
-      board[y][x] === 0
-    ) {
-      for (let i = y - 1; i >= 0 && i < board.length; i = i - 1) {
-        if (board[i][x] === turnColor) {
-          newBoard[y][x] = turnColor;
-          for (let j = y - 1; j > i; j = j - 1) {
-            newBoard[j][x] = turnColor;
-          }
-          setTurnColor(3 - turnColor);
-        }
-      }
-    }
-    //左
-    if (board[x + 1] !== undefined && board[y][x] === 0 && board[y][x + 1] !== turnColor) {
-      for (let i = x + 1; i < board.length; i++) {
-        if (board[y][i] === turnColor) {
-          newBoard[y][x] = turnColor;
-          for (let j = x + 1; j < i; j++) {
-            newBoard[y][j] = turnColor;
-          }
-          setTurnColor(3 - turnColor);
-        }
-      }
-    }
-    //右
-    if (board[x - 1] !== undefined && board[y][x] === 0 && board[y][x - 1] !== turnColor) {
-      for (let i = x - 1; i >= 0 && i < board.length; i = i - 1) {
-        if (board[y][i] === turnColor) {
-          newBoard[y][x] = turnColor;
-          for (let j = x - 1; j > i; j = j - 1) {
-            newBoard[y][j] = turnColor;
-          }
-          setTurnColor(3 - turnColor);
-        }
-      }
-    }
+    const directions = [
+      [-1, 0], // 上
+      [-1, 1], // 右上
+      [0, 1], // 右
+      [1, 1], // 右下
+      [1, 0], // 下
+      [1, -1], // 左下
+      [0, -1], // 左
+      [-1, -1], // 左上
+    ];
 
-    // 右上機能してません
-    if (
-      board[y - 1] !== undefined &&
-      board[y - 1][x - 1] !== undefined &&
-      board[y - 1][x - 1] !== 0 &&
-      board[y - 1][x - 1] !== turnColor &&
-      board[y][x] === 0
-    ) {
-      for (let i = 1; y - i >= 0 && x + i < board.length; i++) {
-        if (board[y - i][x - i] === turnColor) {
-          newBoard[y][x] = turnColor;
-          for (let j = 1; j < i; j++) {
-            newBoard[y - j][x - j] = turnColor;
+    for (const direction of directions) {
+      const dy = direction[0];
+      const dx = direction[1];
+      if (
+        board[y + dy] !== undefined &&
+        board[y + dy][x + dx] !== undefined &&
+        board[y + dy][x + dx] !== 0 &&
+        board[y + dy][x + dx] !== turnColor &&
+        board[y][x] === 0
+      ) {
+        for (
+          let i = 1;
+          y + i * dy >= 0 &&
+          y + i * dy < board.length &&
+          x + i * dx >= 0 &&
+          x + i * dx < board.length;
+          i++
+        ) {
+          if (board[y + i * dy][x + i * dx] === turnColor) {
+            newBoard[y][x] = turnColor;
+            for (let j = 1; j < i; j++) {
+              newBoard[y + j * dy][x + j * dx] = turnColor;
+            }
+            setTurnColor(3 - turnColor);
+            break;
           }
-          setTurnColor(3 - turnColor);
+        }
+        for (let rowIndex = 0; rowIndex < board.length; rowIndex++) {
+          for (let cellIndex = 0; cellIndex < board[rowIndex].length; cellIndex++) {
+            if (
+              board[rowIndex + dy] !== undefined &&
+              board[rowIndex + dy][cellIndex + dx] !== undefined &&
+              board[rowIndex + dy][cellIndex + dx] !== 0 &&
+              board[rowIndex + dy][cellIndex + dx] !== turnColor &&
+              board[rowIndex][cellIndex] === 0
+            ) {
+              newBoard[rowIndex][cellIndex] = -1;
+            }
+          }
         }
       }
     }
-
-    console.log(turnColor);
     setBoard(newBoard);
   };
 
@@ -110,12 +94,16 @@ const Home = () => {
               {color !== 0 && (
                 <div
                   className={styles.stone}
-                  style={{ background: color === 1 ? '#000' : '#fff' }}
+                  style={{ background: color === 1 ? '#000' : color === 2 ? '#fff' : '#ff0' }}
                 />
               )}
             </div>
           ))
         )}
+      </div>
+      <div>{turnColor === 1 ? '黒のターン' : '白のターン'}</div>
+      <div>
+        黒{count_stone(1)} 白{count_stone(2)}
       </div>
     </div>
   );
